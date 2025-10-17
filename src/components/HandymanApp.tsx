@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Button,
   Dropdown,
@@ -8,7 +7,6 @@ import {
   DropdownItemIcon,
   Icon,
   NestedDropdownProvider,
-  PluginLayout,
 } from '@frontapp/ui-kit';
 import styled from 'styled-components';
 
@@ -26,6 +24,13 @@ const HeaderContent = styled.div`
   max-width: 100%;
 `;
 
+const AppContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+`;
+
 const HeaderContainer = styled.div`
   display: flex;
   align-items: center;
@@ -33,6 +38,13 @@ const HeaderContainer = styled.div`
   gap: 0.5rem;
   width: 100%;
   max-width: 100%;
+`;
+
+const ContentArea = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 0; /* This is important for flex to work properly */
 `;
 
 
@@ -47,6 +59,7 @@ const RightSection = styled.div`
   align-items: center;
   gap: 0.5rem;
   margin-left: auto;
+  margin-right: 10px;
 `;
 
 const SelectWrapper = styled.div`
@@ -89,67 +102,110 @@ function HandymanApp() {
         enableKeyboardNavigation: true,
       }}
     >
-      <PluginLayout>
+      <AppContainer>
         <HeaderContainer>
-            <HeaderContent>
-              <LeftSection>
-                <SelectWrapper>
-                  <DropdownCoordinator
-                    placement="bottom-start"
-                    renderButton={(isOpen, isDisabled, buttonRef) => (
-                      <div ref={buttonRef}>
-                        <DropdownButton
-                          value={
-                            selectedTool
-                              ? [`${selectedTool.icon} ${selectedTool.name}`]
-                              : []
+          <HeaderContent>
+            <LeftSection>
+              <SelectWrapper>
+                <DropdownCoordinator
+                  placement="bottom-start"
+                  renderButton={(isOpen, isDisabled, buttonRef) => (
+                    <div ref={buttonRef}>
+                      <DropdownButton
+                        value={
+                          selectedTool
+                            ? [`${selectedTool.icon} ${selectedTool.name}`]
+                            : []
+                        }
+                        isActive={isOpen}
+                        isDisabled={isDisabled}
+                        placeholder="Select a tool"
+                      />
+                    </div>
+                  )}
+                  renderDropdown={(onRequestClose) => {
+                    const categoryIcons: Record<
+                      ToolCategory,
+                      'Archive' | 'Star' | 'Calendar'
+                    > = {
+                      calculators: 'Archive',
+                      converters: 'Star',
+                      utilities: 'Calendar',
+                      'cx-tools': 'Star',
+                    };
+
+                    const categoryColors: Record<ToolCategory, string> = {
+                      calculators: '#4A90E2',
+                      converters: '#4CAF50',
+                      utilities: '#FF9800',
+                      'cx-tools': '#9C27B0',
+                    };
+
+                    const categories: ToolCategory[] = [
+                      'calculators',
+                      'converters',
+                      'utilities',
+                      'cx-tools',
+                    ];
+
+                    // Get favorited tools
+                    const favoriteTools = TOOLS.filter((tool) =>
+                      favorites.has(tool.id)
+                    );
+
+                    return (
+                      <Dropdown shouldUseItemsHeight maxWidth={200}>
+                        {/* Favorites section - always visible */}
+                        <DropdownItem
+                          submenuId="favorites"
+                          height={36}
+                          submenu={
+                            <Dropdown shouldUseItemsHeight maxWidth={250}>
+                              {favoriteTools.length > 0 ? (
+                                favoriteTools.map((tool) => (
+                                  <DropdownItem
+                                    key={tool.id}
+                                    height={36}
+                                    onClick={() =>
+                                      handleToolChange(tool, onRequestClose)
+                                    }
+                                    isSelected={
+                                      tool.id === selectedTool?.id
+                                    }
+                                  >
+                                    {tool.icon} {tool.name}
+                                  </DropdownItem>
+                                ))
+                              ) : (
+                                <DropdownItem
+                                  key="no-favorites"
+                                  height={36}
+                                >
+                                  No favorites
+                                </DropdownItem>
+                              )}
+                            </Dropdown>
                           }
-                          isActive={isOpen}
-                          isDisabled={isDisabled}
-                          placeholder="Select a tool"
-                        />
-                      </div>
-                    )}
-                    renderDropdown={(onRequestClose) => {
-                      const categoryIcons: Record<
-                        ToolCategory,
-                        'Archive' | 'Star' | 'Calendar'
-                      > = {
-                        calculators: 'Archive',
-                        converters: 'Star',
-                        utilities: 'Calendar',
-                        'cx-tools': 'Star',
-                      };
+                        >
+                          <DropdownItemIcon
+                            color="#FFD700"
+                            iconName="Star"
+                          />
+                          Favorites {favoriteTools.length > 0 && `(${favoriteTools.length})`}
+                        </DropdownItem>
 
-                      const categoryColors: Record<ToolCategory, string> = {
-                        calculators: '#4A90E2',
-                        converters: '#4CAF50',
-                        utilities: '#FF9800',
-                        'cx-tools': '#9C27B0',
-                      };
+                        {/* Categories with submenus */}
+                        {categories.map((category) => {
+                          const categoryTools = toolsByCategory[category];
 
-                      const categories: ToolCategory[] = [
-                        'calculators',
-                        'converters',
-                        'utilities',
-                        'cx-tools',
-                      ];
-
-                      // Get favorited tools
-                      const favoriteTools = TOOLS.filter((tool) =>
-                        favorites.has(tool.id)
-                      );
-
-                      return (
-                        <Dropdown shouldUseItemsHeight maxWidth={200}>
-                          {/* Favorites section - always visible */}
-                          <DropdownItem
-                            submenuId="favorites"
-                            height={36}
-                            submenu={
-                              <Dropdown shouldUseItemsHeight maxWidth={250}>
-                                {favoriteTools.length > 0 ? (
-                                  favoriteTools.map((tool) => (
+                          return (
+                            <DropdownItem
+                              key={category}
+                              submenuId={`tool-${category}`}
+                              height={36}
+                              submenu={
+                                <Dropdown shouldUseItemsHeight maxWidth={250}>
+                                  {categoryTools.map((tool) => (
                                     <DropdownItem
                                       key={tool.id}
                                       height={36}
@@ -162,80 +218,39 @@ function HandymanApp() {
                                     >
                                       {tool.icon} {tool.name}
                                     </DropdownItem>
-                                  ))
-                                ) : (
-                                  <DropdownItem
-                                    key="no-favorites"
-                                    height={36}
-                                  >
-                                    No favorites
-                                  </DropdownItem>
-                                )}
-                              </Dropdown>
-                            }
-                          >
-                            <DropdownItemIcon
-                              color="#FFD700"
-                              iconName="Star"
-                            />
-                            Favorites {favoriteTools.length > 0 && `(${favoriteTools.length})`}
-                          </DropdownItem>
-
-                          {/* Categories with submenus */}
-                          {categories.map((category) => {
-                            const categoryTools = toolsByCategory[category];
-
-                            return (
-                              <DropdownItem
-                                key={category}
-                                submenuId={`tool-${category}`}
-                                height={36}
-                                submenu={
-                                  <Dropdown shouldUseItemsHeight maxWidth={250}>
-                                    {categoryTools.map((tool) => (
-                                      <DropdownItem
-                                        key={tool.id}
-                                        height={36}
-                                        onClick={() =>
-                                          handleToolChange(tool, onRequestClose)
-                                        }
-                                        isSelected={
-                                          tool.id === selectedTool?.id
-                                        }
-                                      >
-                                        {tool.icon} {tool.name}
-                                      </DropdownItem>
-                                    ))}
-                                  </Dropdown>
-                                }
-                              >
-                                <DropdownItemIcon
-                                  color={categoryColors[category]}
-                                  iconName={categoryIcons[category]}
-                                />
-                                {CATEGORY_LABELS[category]}
-                              </DropdownItem>
-                            );
-                          })}
-                        </Dropdown>
-                      );
-                    }}
+                                  ))}
+                                </Dropdown>
+                              }
+                            >
+                              <DropdownItemIcon
+                                color={categoryColors[category]}
+                                iconName={categoryIcons[category]}
+                              />
+                              {CATEGORY_LABELS[category]}
+                            </DropdownItem>
+                          );
+                        })}
+                      </Dropdown>
+                    );
+                  }}
+                />
+              </SelectWrapper>
+            </LeftSection>
+            <RightSection>
+              {selectedTool && (
+                <Button type="icon" onClick={handleToggleFavorite}>
+                  <Icon
+                    name={isFavorite(selectedTool.id) ? 'StarFilled' : 'Star'}
                   />
-                </SelectWrapper>
-              </LeftSection>
-              <RightSection>
-                {selectedTool && (
-                  <Button type="icon" onClick={handleToggleFavorite}>
-                    <Icon
-                      name={isFavorite(selectedTool.id) ? 'StarFilled' : 'Star'}
-                    />
-                  </Button>
-                )}
-              </RightSection>
-            </HeaderContent>
-          </HeaderContainer>
-        <ToolContent selectedTool={selectedTool} />
-      </PluginLayout>
+                </Button>
+              )}
+            </RightSection>
+          </HeaderContent>
+        </HeaderContainer>
+        <ContentArea>
+          <ToolContent selectedTool={selectedTool} />
+        </ContentArea>
+      </AppContainer>
     </NestedDropdownProvider>
   );
 }

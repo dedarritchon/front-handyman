@@ -3,11 +3,7 @@ import styled from 'styled-components';
 import { Tool } from '../../types/tools';
 
 const ContentContainer = styled.main`
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 16px;
-  height: 100%;
+  min-height: 100%;
 `;
 
 const EmptyState = styled.div`
@@ -15,7 +11,7 @@ const EmptyState = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  min-height: calc(100vh - 120px); /* Account for header height */
   padding: 16px;
   text-align: center;
 `;
