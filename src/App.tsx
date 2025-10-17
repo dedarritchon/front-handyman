@@ -4,6 +4,7 @@ import { createGlobalStyle } from 'styled-components';
 import HandymanApp from './components/HandymanApp';
 import { FavoritesProvider } from './context/FavoritesContext';
 import { FrontContextProvider } from './context/FrontContextProvider';
+import { SelectedToolProvider } from './context/SelectedToolContext';
 
 // Global styles to prevent overflow issues in iframe
 const GlobalStyle = createGlobalStyle`
@@ -31,7 +32,9 @@ function App() {
       <GlobalStyle />
       <FrontContextProvider>
         <FavoritesProvider>
-          <HandymanApp />
+          <SelectedToolProvider>
+            <HandymanApp />
+          </SelectedToolProvider>
         </FavoritesProvider>
       </FrontContextProvider>
     </DefaultStyleProvider>

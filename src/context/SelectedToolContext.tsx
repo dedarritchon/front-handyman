@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { Tool } from '../types/tools';
+import { TOOLS } from '../constants/tools';
 
 interface SelectedToolContextType {
   selectedTool: Tool | null;
@@ -17,8 +18,9 @@ const loadSelectedTool = (): Tool | null => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      const parsed = JSON.parse(stored) as Tool;
-      return parsed;
+      const toolId = JSON.parse(stored) as string;
+      const tool = TOOLS.find(t => t.id === toolId);
+      return tool || null;
     }
   } catch (error) {
     console.error('Failed to load selected tool:', error);
@@ -30,7 +32,7 @@ const loadSelectedTool = (): Tool | null => {
 const saveSelectedTool = (tool: Tool | null) => {
   try {
     if (tool) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(tool));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tool.id));
     } else {
       localStorage.removeItem(STORAGE_KEY);
     }

@@ -12,6 +12,7 @@ import styled from 'styled-components';
 
 import { CATEGORY_LABELS, TOOLS } from '../constants/tools';
 import { useFavorites } from '../context/FavoritesContext';
+import { useSelectedTool } from '../context/SelectedToolContext';
 import { Tool, ToolCategory } from '../types/tools';
 import ToolContent from './layout/ToolContent';
 
@@ -68,7 +69,7 @@ const SelectWrapper = styled.div`
 `;
 
 function HandymanApp() {
-  const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
+  const { selectedTool, setSelectedTool } = useSelectedTool();
   const { favorites, isFavorite, toggleFavorite } = useFavorites();
 
   const handleToolChange = (tool: Tool, onClose: () => void) => {
