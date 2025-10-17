@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fromZonedTime, toZonedTime, formatInTimeZone } from 'date-fns-tz';
+import { formatInTimeZone } from 'date-fns-tz';
 
 import { FormGroup, Label, Result, ResultLabel, ResultValue, Select } from '../common/FormElements';
 import ToolCard from '../common/ToolCard';
@@ -111,7 +111,6 @@ function CustomerLocalTime() {
 
       // Calculate customer's local time using proper timezone conversion
       try {
-        const customerDate = toZonedTime(now, customerTimezone);
         const customerTimeString = formatInTimeZone(now, customerTimezone, 'HH:mm:ss');
         setCustomerTime(customerTimeString);
       } catch (error) {

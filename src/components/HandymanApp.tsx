@@ -51,6 +51,7 @@ const RightSection = styled.div`
 
 const SelectWrapper = styled.div`
   min-width: 200px;
+  padding: 10px;
 `;
 
 function HandymanApp() {

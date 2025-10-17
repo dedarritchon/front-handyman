@@ -18,7 +18,6 @@ import CustomerLocalTime from '../components/cx-tools/CustomerLocalTime';
 import ETACalculator from '../components/cx-tools/ETACalculator';
 import ResponseTimeCalculator from '../components/cx-tools/ResponseTimeCalculator';
 import SLADeadlineEstimator from '../components/cx-tools/SLADeadlineEstimator';
-import SnippetRandomizer from '../components/cx-tools/SnippetRandomizer';
 import Base64Tool from '../components/utilities/Base64Tool';
 import ClipboardCleaner from '../components/utilities/ClipboardCleaner';
 import ColorPicker from '../components/utilities/ColorPicker';
@@ -217,14 +216,6 @@ export const TOOLS: Tool[] = [
     category: 'cx-tools',
     icon: '🕐',
     component: CustomerLocalTime,
-  },
-  {
-    id: 'snippet-randomizer',
-    name: 'Snippet Randomizer',
-    description: 'Choose from pre-set responses',
-    category: 'cx-tools',
-    icon: '🎲',
-    component: SnippetRandomizer,
   },
 ];
 

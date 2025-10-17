@@ -7,7 +7,6 @@ import {
   Result,
   ResultLabel,
   ResultValue,
-  Select,
 } from '../common/FormElements';
 import ToolCard from '../common/ToolCard';
 
