@@ -2,11 +2,11 @@ import { Tool } from '../types/tools';
 
 // Import tool components
 import BasicCalculator from '../components/calculators/BasicCalculator';
-import CurrencyConverter from '../components/calculators/CurrencyConverter';
 import MarkupMarginCalculator from '../components/calculators/MarkupMarginCalculator';
 import PercentageCalculator from '../components/calculators/PercentageCalculator';
 import TaxCalculator from '../components/calculators/TaxCalculator';
 import UnitPriceCalculator from '../components/calculators/UnitPriceCalculator';
+import CurrencyConverter from '../components/converters/CurrencyConverter';
 import AreaConverter from '../components/converters/AreaConverter';
 import LengthConverter from '../components/converters/LengthConverter';
 import SpeedConverter from '../components/converters/SpeedConverter';

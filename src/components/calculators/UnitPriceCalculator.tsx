@@ -12,9 +12,8 @@ import {
 import ToolCard from '../common/ToolCard';
 
 function UnitPriceCalculator() {
-  const [totalPrice, setTotalPrice] = useState('');
-  const [quantity, setQuantity] = useState('');
-  const [unit, setUnit] = useState('items');
+  const [totalPrice, setTotalPrice] = useState('100');
+  const [quantity, setQuantity] = useState('10');
 
   const calculateUnitPrice = () => {
     const price = parseFloat(totalPrice);
@@ -53,25 +52,11 @@ function UnitPriceCalculator() {
         />
       </FormGroup>
 
-      <FormGroup>
-        <Label>Unit Type</Label>
-        <Select value={unit} onChange={(e) => setUnit(e.target.value)}>
-          <option value="items">Items</option>
-          <option value="kg">Kilograms (kg)</option>
-          <option value="lb">Pounds (lb)</option>
-          <option value="oz">Ounces (oz)</option>
-          <option value="L">Liters (L)</option>
-          <option value="gal">Gallons (gal)</option>
-          <option value="m">Meters (m)</option>
-          <option value="ft">Feet (ft)</option>
-        </Select>
-      </FormGroup>
-
       {unitPrice !== null && (
         <Result>
           <ResultLabel>Unit Price</ResultLabel>
           <ResultValue>
-            ${unitPrice.toFixed(4)} per {unit}
+            ${unitPrice.toFixed(2)} per unit
           </ResultValue>
         </Result>
       )}

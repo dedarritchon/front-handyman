@@ -11,8 +11,8 @@ import {
 import ToolCard from '../common/ToolCard';
 
 function MarkupMarginCalculator() {
-  const [cost, setCost] = useState('');
-  const [price, setPrice] = useState('');
+  const [cost, setCost] = useState('100');
+  const [price, setPrice] = useState('120');
 
   const calculateMarkup = () => {
     const costVal = parseFloat(cost);

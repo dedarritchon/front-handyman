@@ -11,8 +11,8 @@ import {
 import ToolCard from '../common/ToolCard';
 
 function TaxCalculator() {
-  const [amount, setAmount] = useState('');
-  const [taxRate, setTaxRate] = useState('');
+  const [amount, setAmount] = useState('100');
+  const [taxRate, setTaxRate] = useState('10');
 
   const calculateTaxAmount = () => {
     const amt = parseFloat(amount);

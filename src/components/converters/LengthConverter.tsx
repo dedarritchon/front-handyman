@@ -5,69 +5,112 @@ import {
   FormGroup,
   Input,
   Label,
-  Result,
-  ResultLabel,
-  ResultValue,
   Select,
 } from '../common/FormElements';
 import ToolCard from '../common/ToolCard';
 
-const LENGTH_UNITS: Record<string, { name: string; toMeters: number }> = {
-  mm: { name: 'Millimeter', toMeters: 0.001 },
-  cm: { name: 'Centimeter', toMeters: 0.01 },
-  m: { name: 'Meter', toMeters: 1 },
-  km: { name: 'Kilometer', toMeters: 1000 },
-  in: { name: 'Inch', toMeters: 0.0254 },
-  ft: { name: 'Foot', toMeters: 0.3048 },
-  yd: { name: 'Yard', toMeters: 0.9144 },
-  mi: { name: 'Mile', toMeters: 1609.344 },
+const LENGTH_UNITS: Record<string, { name: string; toMeters: number; symbol: string }> = {
+  mm: { name: 'Millimeter', toMeters: 0.001, symbol: 'mm' },
+  cm: { name: 'Centimeter', toMeters: 0.01, symbol: 'cm' },
+  m: { name: 'Meter', toMeters: 1, symbol: 'm' },
+  km: { name: 'Kilometer', toMeters: 1000, symbol: 'km' },
+  in: { name: 'Inch', toMeters: 0.0254, symbol: 'in' },
+  ft: { name: 'Foot', toMeters: 0.3048, symbol: 'ft' },
+  yd: { name: 'Yard', toMeters: 0.9144, symbol: 'yd' },
+  mi: { name: 'Mile', toMeters: 1609.344, symbol: 'mi' },
 };
 
-const ConversionRow = styled.div`
+const InputRow = styled.div`
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 2fr 1fr;
   gap: 12px;
-  align-items: end;
+  margin-bottom: 24px;
 `;
 
-const SwapButton = styled.button`
-  padding: 10px 16px;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  background-color: white;
-  color: #495057;
-  font-size: 18px;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-bottom: 8px;
-
-  &:hover {
-    background-color: #f8f9fa;
-    transform: scale(1.05);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
+const UnitGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
 `;
 
-const ResultWithCopy = styled.div`
+const UnitCard = styled.div<{ $isBase?: boolean }>`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
+  padding: 12px 14px;
+  border: 2px solid ${(props) => (props.$isBase ? '#0d6efd' : '#dee2e6')};
+  border-radius: 8px;
+  background-color: ${(props) => (props.$isBase ? '#e7f1ff' : 'white')};
+  transition: all 0.2s;
+  min-height: 60px;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+`;
+
+const UnitInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  min-width: 120px;
+  max-width: 50%;
+`;
+
+const UnitIcon = styled.span`
+  font-size: 24px;
+  flex-shrink: 0;
+`;
+
+const UnitDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+`;
+
+const UnitCode = styled.div`
+  font-weight: 600;
+  font-size: 14px;
+  color: #212529;
+  white-space: nowrap;
+`;
+
+const UnitName = styled.div`
+  font-size: 11px;
+  color: #6c757d;
+  white-space: nowrap;
+`;
+
+const ConvertedValue = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  color: #212529;
+  margin: 0 8px;
+  word-break: break-all;
+  text-align: right;
+  flex: 1;
+  min-width: 0;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const CopyButton = styled.button`
-  padding: 4px 12px;
+  padding: 6px 10px;
   border: 1px solid #dee2e6;
   border-radius: 4px;
   background-color: white;
   color: #6c757d;
-  font-size: 12px;
+  font-size: 11px;
   cursor: pointer;
   transition: all 0.2s;
+  flex-shrink: 0;
+  white-space: nowrap;
 
   &:hover {
     background-color: #f8f9fa;
@@ -79,31 +122,41 @@ const CopyButton = styled.button`
   }
 `;
 
-function LengthConverter() {
-  const [value, setValue] = useState('');
-  const [fromUnit, setFromUnit] = useState('m');
-  const [toUnit, setToUnit] = useState('ft');
+const RightSection = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
+`;
 
-  const swap = () => {
-    setFromUnit(toUnit);
-    setToUnit(fromUnit);
-  };
+function LengthConverter() {
+  const [value, setValue] = useState('1');
+  const [baseUnit, setBaseUnit] = useState('m');
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
   };
 
-  const convert = () => {
+  const convertAll = () => {
     const val = parseFloat(value);
-    if (!isNaN(val)) {
-      const valueInMeters = val * LENGTH_UNITS[fromUnit].toMeters;
-      return valueInMeters / LENGTH_UNITS[toUnit].toMeters;
-    }
-    return null;
+    if (isNaN(val) || !value) return {};
+
+    const results: Record<string, number> = {};
+    const valueInMeters = val * LENGTH_UNITS[baseUnit].toMeters;
+    
+    Object.keys(LENGTH_UNITS).forEach((unit) => {
+      if (unit !== baseUnit) {
+        results[unit] = valueInMeters / LENGTH_UNITS[unit].toMeters;
+      }
+    });
+
+    return results;
   };
 
-  const result = convert();
+  const conversions = convertAll();
   const units = Object.keys(LENGTH_UNITS);
+  const hasValidValue = value && !isNaN(parseFloat(value));
 
   return (
     <ToolCard
@@ -111,21 +164,21 @@ function LengthConverter() {
       icon="📏"
       description="Convert between different length units"
     >
-      <FormGroup>
-        <Label>Value</Label>
-        <Input
-          type="number"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder="Enter value"
-          autoFocus
-        />
-      </FormGroup>
-
-      <ConversionRow>
+      <InputRow>
         <FormGroup>
-          <Label>From</Label>
-          <Select value={fromUnit} onChange={(e) => setFromUnit(e.target.value)}>
+          <Label>Value</Label>
+          <Input
+            type="number"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="Enter value"
+            autoFocus
+          />
+        </FormGroup>
+
+        <FormGroup>
+          <Label>Base Unit</Label>
+          <Select value={baseUnit} onChange={(e) => setBaseUnit(e.target.value)}>
             {units.map((unit) => (
               <option key={unit} value={unit}>
                 {LENGTH_UNITS[unit].name} ({unit})
@@ -133,37 +186,46 @@ function LengthConverter() {
             ))}
           </Select>
         </FormGroup>
+      </InputRow>
 
-        <SwapButton onClick={swap} title="Swap units">
-          ⇄
-        </SwapButton>
+      {hasValidValue && (
+        <>
+          {/* Show base unit card */}
+          <UnitCard $isBase>
+            <UnitInfo>
+              <UnitIcon>📏</UnitIcon>
+              <UnitDetails>
+                <UnitCode>{LENGTH_UNITS[baseUnit].symbol}</UnitCode>
+                <UnitName>{LENGTH_UNITS[baseUnit].name}</UnitName>
+              </UnitDetails>
+            </UnitInfo>
+            <ConvertedValue>{parseFloat(value).toFixed(6).replace(/\.?0+$/, '')}</ConvertedValue>
+          </UnitCard>
 
-        <FormGroup>
-          <Label>To</Label>
-          <Select value={toUnit} onChange={(e) => setToUnit(e.target.value)}>
-            {units.map((unit) => (
-              <option key={unit} value={unit}>
-                {LENGTH_UNITS[unit].name} ({unit})
-              </option>
+          <UnitGrid>
+            {Object.entries(conversions).map(([unit, convertedValue]) => (
+              <UnitCard key={unit}>
+                <UnitInfo>
+                  <UnitIcon>📏</UnitIcon>
+                  <UnitDetails>
+                    <UnitCode>{LENGTH_UNITS[unit].symbol}</UnitCode>
+                    <UnitName>{LENGTH_UNITS[unit].name}</UnitName>
+                  </UnitDetails>
+                </UnitInfo>
+                <RightSection>
+                  <ConvertedValue>
+                    {convertedValue.toFixed(6).replace(/\.?0+$/, '')}
+                  </ConvertedValue>
+                  <CopyButton 
+                    onClick={() => copyToClipboard(convertedValue.toFixed(6).replace(/\.?0+$/, ''))}
+                  >
+                    Copy
+                  </CopyButton>
+                </RightSection>
+              </UnitCard>
             ))}
-          </Select>
-        </FormGroup>
-      </ConversionRow>
-
-      {result !== null && (
-        <Result>
-          <ResultLabel>
-            {value} {fromUnit} =
-          </ResultLabel>
-          <ResultWithCopy>
-            <ResultValue>
-              {result.toFixed(6).replace(/\.?0+$/, '')} {toUnit}
-            </ResultValue>
-            <CopyButton onClick={() => copyToClipboard(result.toFixed(6).replace(/\.?0+$/, ''))}>
-              Copy
-            </CopyButton>
-          </ResultWithCopy>
-        </Result>
+          </UnitGrid>
+        </>
       )}
     </ToolCard>
   );

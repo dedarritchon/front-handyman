@@ -68,8 +68,8 @@ const ResultWithCopy = styled.div`
 `;
 
 function PercentageCalculator() {
-  const [value, setValue] = useState('');
-  const [percentage, setPercentage] = useState('');
+  const [value, setValue] = useState('100');
+  const [percentage, setPercentage] = useState('10');
 
   const quickPercentages = [5, 10, 15, 20, 25, 50, 75];
 
