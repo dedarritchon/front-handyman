@@ -32,7 +32,7 @@ const CurrencyGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 10px;
-  margin-top: 16px;
+  margin-top: 8px;
 `;
 
 const CurrencyCard = styled.div<{ $isBase?: boolean }>`
@@ -123,9 +123,7 @@ const RightSection = styled.div`
 const InfoNote = styled.div`
   font-size: 12px;
   color: #6c757d;
-  margin-top: 16px;
   padding: 8px 12px;
-  background-color: #f8f9fa;
   border-radius: 6px;
   text-align: center;
 `;
@@ -338,6 +336,12 @@ function CurrencyConverter() {
             <ConvertedValue>{parseFloat(amount).toFixed(2)}</ConvertedValue>
           </CurrencyCard>
 
+          <InfoNote>
+            ▼ Rates updated: {lastUpdated}
+            {' '}
+            Via <a href="https://github.com/fawazahmed0/currency-api" target="_blank" rel="noopener noreferrer">Currency API</a>
+          </InfoNote>
+
           <CurrencyGrid>
             {sortedConversions.slice(0, 30).map(([currency, value]) => {
               const rate = exchangeRates[currency];
@@ -363,16 +367,6 @@ function CurrencyConverter() {
               );
             })}
           </CurrencyGrid>
-
-          <InfoNote>
-            📅 Rates updated: {lastUpdated}
-
-            {' '}
-            Via <a href="https://github.com/fawazahmed0/currency-api" target="_blank" rel="noopener noreferrer">Currency API</a>
-            <RefreshButton onClick={() => fetchExchangeRates(baseCurrency)}>
-              Refresh
-            </RefreshButton>
-          </InfoNote>
         </>
       )}
     </ToolCard>
